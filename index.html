@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Especial - Jogos de Alfabetização</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🌟 ABC Especial 🌟</h1>
+            <p class="subtitle">Aprendendo com diversão!</p>
+        </header>
+
+        <nav class="game-menu">
+            <button class="game-btn" id="lettersGame" onclick="startGame('letters')">
+                <div class="game-icon">🔤</div>
+                <div class="game-title">Reconhecer Letras</div>
+            </button>
+            
+            <button class="game-btn" id="wordsGame" onclick="startGame('words')">
+                <div class="game-icon">🔤</div>
+                <div class="game-title">Formar Palavras</div>
+            </button>
+            
+            <button class="game-btn" id="matchGame" onclick="startGame('match')">
+                <div class="game-icon">🖼️</div>
+                <div class="game-title">Palavra e Imagem</div>
+            </button>
+        </nav>
+
+        <div class="progress-container">
+            <div class="progress-label">Progresso:</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="stars" id="starsContainer"></div>
+        </div>
+
+        <main class="game-area" id="gameArea">
+            <div class="welcome-message">
+                <h2>Bem-vindo ao ABC Especial!</h2>
+                <p>Escolha um jogo para começar a aprender!</p>
+                <div class="welcome-emoji">😊</div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button class="control-btn" id="backBtn" onclick="goBack()" style="display: none;">
+                ← Voltar
+            </button>
+            <button class="control-btn success" id="nextBtn" onclick="nextLevel()" style="display: none;">
+                Próximo →
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
