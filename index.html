@@ -1,144 +1,183 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABC Especial - Jogos de Alfabetização</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle de Cotas de Xerox</title>
+  <style>
+    :root{ --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --text:#e5e7eb; --brand:#22c55e; --brand-2:#14b8a6; --danger:#ef4444; --ok:#22c55e; --card:#0b1220; --chip:#1f2937; --input:#0b1220; --border:#1f2937; }
+    [data-theme="light"]{ --bg:#f8fafc; --panel:#ffffff; --muted:#64748b; --text:#0f172a; --brand:#16a34a; --brand-2:#0ea5a4; --danger:#dc2626; --ok:#16a34a; --card:#ffffff; --chip:#f1f5f9; --input:#ffffff; --border:#e2e8f0; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(120deg,var(--bg),var(--panel));color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto}
+    .container{max-width:1200px;margin:24px auto;padding:0 16px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    header h1{font-size:clamp(18px,3vw,28px);margin:0}
+    .badge{padding:6px 10px;border:1px solid var(--border);background:var(--chip);border-radius:999px;color:var(--muted);font-size:12px}
+    .panel{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .grid{display:grid;gap:12px}
+    .grid.cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+    @media (max-width:980px){.grid.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:560px){.grid.cards{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+    .card h3{margin:0 0 8px 0;font-size:14px;color:var(--muted);font-weight:600}
+    .card .value{font-size:22px;font-weight:700}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:16px 0}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    thead th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;background:rgba(255,255,255,.03);padding:10px}
+    tbody td{padding:10px;border-top:1px solid var(--border);vertical-align:middle}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    .progress{height:8px;background:#0a0f1d;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+    .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));width:0%}
+    .pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:var(--chip)}
+    .actions{display:flex;gap:6px;flex-wrap:wrap}
+    .actions button{padding:6px 8px;border-radius:10px;font-size:12px}
+    .actions input[type=number]{width:84px;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
+    .footer{margin:24px 0;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .kbd{font-family:ui-monospace,Consolas,Menlo,monospace;font-size:12px;background:#0a0f1d;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+    /* Modal */
+    #tokenOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:10000}
+    #tokenModal{display:none;position:fixed;inset:0;place-items:center;z-index:10001}
+    #tokenModal .box{width:min(420px,92vw);background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">🌟 ABC Especial 🌟</h1>
-            <p class="subtitle">Aprendendo com diversão!</p>
-        </header>
+  <div class="container">
+    <header>
+      <div class="row">
+        <h1>Controle de Cotas de Xerox</h1>
+        <span id="monthBadge" class="badge">mês: —</span>
+        <span id="repoBadge" class="badge">repo: sourceoc/xerox-non@main → xerox_data_agosto.json</span>
+      </div>
+      <div class="row">
+        <button id="themeBtn" title="Alternar tema">Tema</button>
+        <button id="connectBtn" class="ghost" title="Definir token do GitHub">Conectar GitHub</button>
+        <button id="loadBtn" title="Carregar do GitHub">Carregar do GitHub</button>
+        <button id="saveBtn" class="primary" title="Salvar no GitHub" disabled>Salvar no GitHub</button>
+      </div>
+    </header>
 
-        <!-- Menu de usuário -->
-        <div class="user-menu" id="userMenu">
-            <div class="user-profile" id="userProfile">
-                <div class="avatar" id="userAvatar">👤</div>
-                <div class="user-info">
-                    <div class="username" id="username">Visitante</div>
-                    <div class="user-level" id="userLevel">Nível 1</div>
-                </div>
-                <button class="sound-btn" onclick="toggleSound()" id="soundBtn" title="Ativar/Desativar Som">🔊</button>
-                <button class="settings-btn" onclick="playClickSound(); showSettings()" onmouseover="playHoverSound()">⚙️</button>
-            </div>
-        </div>
+    <!-- KPI cards -->
+    <section class="grid cards" style="margin:14px 0">
+      <div class="card"><h3>Total de Cópias (meta)</h3><div class="value" id="kpiTotal">—</div></div>
+      <div class="card"><h3>Cópias Usadas</h3><div class="value" id="kpiUsed">—</div></div>
+      <div class="card"><h3>Restantes</h3><div class="value" id="kpiLeft">—</div></div>
+      <div class="card"><h3>% Utilizado</h3><div class="value" id="kpiPct">—</div></div>
+    </section>
 
-        <!-- Menu de configurações -->
-        <div class="settings-panel" id="settingsPanel" style="display: none;">
-            <h3>⚙️ Configurações</h3>
-            <div class="settings-group">
-                <label>👤 Nome do Jogador:</label>
-                <input type="text" id="playerName" placeholder="Digite seu nome">
-                <button onclick="playClickSound(); saveProfile()" onmouseover="playHoverSound()">Salvar</button>
-            </div>
-            <div class="settings-group">
-                <label>🎯 Dificuldade:</label>
-                <select id="difficultySelect" onchange="playClickSound(); changeDifficulty()" onmouseover="playHoverSound()">
-                    <option value="easy">😊 Fácil</option>
-                    <option value="medium">😐 Médio</option>
-                    <option value="hard">😤 Difícil</option>
-                </select>
-            </div>
-            <div class="settings-group">
-                <label>🎨 Tema:</label>
-                <select id="themeSelect" onchange="playClickSound(); changeTheme()" onmouseover="playHoverSound()">
-                    <option value="default">🌈 Padrão</option>
-                    <option value="ocean">🌊 Oceano</option>
-                    <option value="space">🚀 Espaço</option>
-                    <option value="forest">🌲 Floresta</option>
-                    <option value="rainbow">🦄 Arco-íris</option>
-                </select>
-            </div>
-            <button class="close-btn" onclick="playClickSound(); hideSettings()" onmouseover="playHoverSound()">Fechar</button>
-        </div>
-
-        <nav class="game-menu">
-            <button class="game-btn" id="lettersGame" onclick="playClickSound(); startGame('letters')" onmouseover="playHoverSound()">
-                <div class="game-icon">🔤</div>
-                <div class="game-title">Reconhecer Letras</div>
-                <div class="game-progress" id="lettersProgress">0/38</div>
-            </button>
-            
-            <button class="game-btn" id="wordsGame" onclick="playClickSound(); startGame('words')" onmouseover="playHoverSound()">
-                <div class="game-icon">🔤</div>
-                <div class="game-title">Formar Palavras</div>
-                <div class="game-progress" id="wordsProgress">0/24</div>
-            </button>
-            
-            <button class="game-btn" id="matchGame" onclick="playClickSound(); startGame('match')" onmouseover="playHoverSound()">
-                <div class="game-icon">🖼️</div>
-                <div class="game-title">Palavra e Imagem</div>
-                <div class="game-progress" id="matchProgress">0/41</div>
-            </button>
-        </nav>
-
-        <div class="progress-container">
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-value" id="scoreDisplay">0</div>
-                    <div class="stat-label">Pontos</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🔥</div>
-                    <div class="stat-value" id="streakDisplay">0</div>
-                    <div class="stat-label">Sequência</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">❤️</div>
-                    <div class="stat-value" id="livesDisplay">3</div>
-                    <div class="stat-label">Vidas</div>
-                </div>
-                <div class="stat-item" id="timerDisplay" style="display: none;">
-                    <div class="stat-icon">⏰</div>
-                    <div class="stat-value" id="timeValue">30</div>
-                    <div class="stat-label">Tempo</div>
-                </div>
-            </div>
-            <div class="progress-label">Progresso do Jogo:</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="achievements-bar" id="achievementsBar"></div>
-        </div>
-
-        <main class="game-area" id="gameArea">
-            <div class="welcome-message">
-                <h2>Bem-vindo ao ABC Especial!</h2>
-                <p>Escolha um jogo para começar a aprender!</p>
-                <div class="welcome-emoji">😊</div>
-            </div>
-        </main>
-
-        <div class="controls">
-            <button class="control-btn" id="backBtn" onclick="playClickSound(); goBack()" onmouseover="playHoverSound()" style="display: none;">
-                ← Voltar
-            </button>
-            <button class="control-btn special" id="hintBtn" onclick="playClickSound(); showHint()" onmouseover="playHoverSound()" style="display: none;">
-                💡 Dica
-            </button>
-            <button class="control-btn warning" id="skipBtn" onclick="playClickSound(); skipQuestion()" onmouseover="playHoverSound()" style="display: none;">
-                ⏭️ Pular
-            </button>
-            <button class="control-btn success" id="nextBtn" onclick="playClickSound(); nextLevel()" onmouseover="playHoverSound()" style="display: none;">
-                Próximo →
-            </button>
-        </div>
-
-        <!-- Modal de conquistas -->
-        <div class="achievement-modal" id="achievementModal" style="display: none;">
-            <div class="achievement-content">
-                <div class="achievement-icon" id="achievementIcon">🏆</div>
-                <h3 id="achievementTitle">Nova Conquista!</h3>
-                <p id="achievementDesc">Você desbloqueou uma nova conquista!</p>
-                <button onclick="playClickSound(); closeAchievement()" onmouseover="playHoverSound()">Continuar</button>
-            </div>
-        </div>
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="left">
+        <input id="search" type="text" placeholder="Buscar por nome ou disciplina…" style="min-width:260px" />
+        <select id="sort">
+          <option value="name">Ordenar: Nome (A→Z)</option>
+          <option value="remaining">Ordenar: Restante (↑)</option>
+          <option value="used">Ordenar: Usado (↓)</option>
+          <option value="discipline">Ordenar: Disciplina (A→Z)</option>
+        </select>
+        <span class="chip" id="countBadge">0 professores</span>
+      </div>
+      <div class="right">
+        <button id="exportBtn" class="ghost">Exportar JSON</button>
+        <button id="csvBtn" class="ghost">Exportar CSV</button>
+        <label class="ghost" style="cursor:pointer"><input id="filePicker" type="file" accept="application/json" style="display:none" /><span>Importar JSON</span></label>
+        <button id="printBtn" class="ghost">Imprimir/Salvar PDF</button>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Tabela -->
+    <div class="panel">
+      <table>
+        <thead><tr><th>Professor(a)</th><th>Disciplina</th><th>Cota</th><th>Usado</th><th>Desconto</th><th>Restante</th><th style="width:260px">Progresso</th><th>Ações</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Adicionar professor -->
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin:0 0 12px 0;color:var(--muted)">Adicionar professor(a)</h3>
+      <div class="row" style="gap:8px"><input id="newName" type="text" placeholder="Nome" /><input id="newDiscipline" type="text" placeholder="Disciplina" /><input id="newQuota" type="number" placeholder="Cota (págs)" /><button id="addBtn" class="primary">Adicionar</button></div>
+    </div>
+
+    <div class="footer"><div>Última modificação: <span id="lastModified">—</span></div><div>App grava direto no seu repositório via API do GitHub.</div></div>
+  </div>
+
+  <!-- Modal só para TOKEN -->
+  <div id="tokenOverlay"></div>
+  <div id="tokenModal"><div class="box">
+    <h3 style="margin:0 0 8px 0">Conectar ao GitHub</h3>
+    <p style="margin:0 0 10px 0;color:var(--muted)">Para <strong>carregar</strong> de <span class="kbd">sourceoc/xerox-non@main → xerox_data_agosto.json</span> não precisa token (repo público). Para <strong>salvar</strong> é obrigatório.</p>
+    <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px">Token (ghp_...)</label>
+    <input id="tokenInput" type="password" placeholder="ghp_xxx" />
+    <div class="row" style="justify-content:flex-end;margin-top:10px;gap:8px">
+      <button id="cancelToken" class="ghost">Cancelar</button>
+      <button id="saveToken" class="primary">Salvar e continuar</button>
+    </div>
+  </div></div>
+
+<script>
+(function(){
+  // ===== Config (fixa) =====
+  let cfg={ owner:'sourceoc', repo:'xerox-non', path:'xerox_data_agosto.json', branch:'main', token:'' };
+  function loadCfg(){ try{ const saved=JSON.parse(localStorage.getItem('xerox_cfg')||'{}'); cfg={...cfg,...saved}; }catch(e){} updateCfgUI(); }
+  function saveCfg(){ const {token,...rest}=cfg; localStorage.setItem('xerox_cfg', JSON.stringify(rest)); updateCfgUI(); }
+  function updateCfgUI(){ document.getElementById('repoBadge').textContent=`repo: ${cfg.owner}/${cfg.repo}@${cfg.branch} → ${cfg.path}`; document.getElementById('saveBtn').disabled=!cfg.token; }
+
+  // ===== Estado =====
+  let state={ data:{ professors:[], month:'', lastModified:'', totalCopies:0, usedCopies:0 }, sha:null, filtered:[] };
+  const $=s=>document.querySelector(s);
+  const fmt=n=>new Intl.NumberFormat('pt-BR').format(n);
+  const monthNames=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const nowISO=()=>new Date().toISOString();
+  const demo={ month:new Date().toISOString().slice(0,7), lastModified:nowISO(), totalCopies:1000, usedCopies:0, professors:[{id:1,name:'Ana Souza',discipline:'Matemática',quota:150,used:15,discount:0},{id:2,name:'Bruno Lima',discipline:'Português',quota:120,used:10,discount:0},{id:3,name:'Carla Nunes',discipline:'História',quota:100,used:40,discount:5}] };
+
+  // ===== Render =====
+  function prettyMonth(m){ if(/^\d{4}-\d{2}$/.test(m)){ const [y,mm]=m.split('-').map(Number); return monthNames[mm-1]+'/'+y; } return m||''; }
+  function remaining(p){ const quota=+p.quota||0, used=+p.used||0, discount=+p.discount||0; return Math.max(0,(quota-used)+discount); }
+  function applyFilterAndSort(){ const q=$('#search').value.trim().toLowerCase(); const sort=$('#sort').value; let list=state.data.professors.map(p=>({...p,quota:+p.quota||0,used:+p.used||0,discount:+p.discount||0})); if(q){ list=list.filter(p=>(`${p.name} ${p.discipline}`).toLowerCase().includes(q)); } list.sort((a,b)=>{ if(sort==='name') return a.name.localeCompare(b.name,'pt-BR'); if(sort==='discipline') return a.discipline.localeCompare(b.discipline,'pt-BR'); if(sort==='remaining') return remaining(a)-remaining(b); if(sort==='used') return b.used-a.used; return 0; }); state.filtered=list; $('#countBadge').textContent=`${list.length} professores`; }
+  function renderTable(){ const tbody=$('#tbody'); tbody.innerHTML=''; state.filtered.forEach(p=>{ const tr=document.createElement('tr'); const pct=Math.min(100,((p.used||0)/(p.quota||1))*100); tr.innerHTML=`<td><strong>${escapeHtml(p.name)}</strong><div class="wip">ID: ${p.id}</div></td><td>${escapeHtml(p.discipline||'—')}</td><td><span class="pill">${fmt(p.quota||0)}</span></td><td><span class="pill">${fmt(p.used||0)}</span></td><td><span class="pill">${fmt(p.discount||0)}</span></td><td><strong>${fmt(remaining(p))}</strong></td><td><div class="progress"><span style="width:${pct}%"></span></div></td><td><div class="actions"><button data-act="delta" data-id="${p.id}" data-delta="-1">-1</button><button data-act="delta" data-id="${p.id}" data-delta="-10">-10</button><button class="primary" data-act="delta" data-id="${p.id}" data-delta="1">+1</button><button class="primary" data-act="delta" data-id="${p.id}" data-delta="10">+10</button><input type="number" min="0" placeholder="desconto" value="${p.discount||0}" data-act="discount" data-id="${p.id}" /><button data-act="reset" data-id="${p.id}" class="ghost">Zerar</button><button data-act="remove" data-id="${p.id}" class="warn">Remover</button></div></td>`; tbody.appendChild(tr); }); }
+  function render(){ const d=state.data; const used=d.professors.reduce((s,p)=>s+(+p.used||0),0); const total=d.totalCopies||d.professors.reduce((s,p)=>s+(+p.quota||0),0); const left=Math.max(0,total-used); const pct=total>0?(used/total)*100:0; $('#kpiTotal').textContent=fmt(total); $('#kpiUsed').textContent=fmt(used); $('#kpiLeft').textContent=fmt(left); $('#kpiPct').textContent=`${pct.toFixed(1)}%`; $('#lastModified').textContent=d.lastModified?new Date(d.lastModified).toLocaleString('pt-BR'):'—'; $('#monthBadge').textContent='mês: '+(prettyMonth(d.month)||'—'); applyFilterAndSort(); renderTable(); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
+
+  // ===== Ações da tabela =====
+  function findById(id){ return state.data.professors.find(p=>String(p.id)===String(id)); }
+  function applyDelta(id,delta){ const p=findById(id); if(!p) return; p.used=Math.max(0,(+p.used||0)+Number(delta)); state.data.lastModified=nowISO(); render(); }
+  function setDiscount(id,v){ const p=findById(id); if(!p) return; p.discount=Math.max(0,Number(v)||0); state.data.lastModified=nowISO(); render(); }
+  function resetOne(id){ const p=findById(id); if(!p) return; p.used=0; p.discount=0; state.data.lastModified=nowISO(); render(); }
+  function removeOne(id){ state.data.professors=state.data.professors.filter(p=>String(p.id)!==String(id)); state.data.lastModified=nowISO(); render(); }
+  function addProfessor(){ const name=$('#newName').value.trim(); const discipline=$('#newDiscipline').value.trim(); const quota=Number($('#newQuota').value); if(!name||!discipline||!quota){ alert('Preencha nome, disciplina e cota.'); return; } const id=Date.now(); state.data.professors.push({name,discipline,quota,used:0,discount:0,id}); $('#newName').value=''; $('#newDiscipline').value=''; $('#newQuota').value=''; state.data.lastModified=nowISO(); render(); }
+
+  // ===== GitHub (público primeiro) =====
+  async function ghFetch(url,opts={},mode='auto'){ const headers={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(opts.headers||{})}; if(mode==='require'&&!cfg.token){ throw new Error('Informe o token do GitHub.'); } if(mode!=='public'&&cfg.token){ headers['Authorization']=`Bearer ${cfg.token}`; } const res=await fetch(url,{...opts,headers}); if(!res.ok){ const txt=await res.text(); throw new Error(`GitHub API ${res.status}: ${txt}`); } return res.json(); }
+  async function loadFromGitHub(){ try{ const {owner,repo,path,branch}=cfg; const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`; let json; try{ json=await ghFetch(url,{},'public'); }catch(e){ if(cfg.token){ json=await ghFetch(url,{},'auto'); } else { throw e; } } state.sha=json.sha; const content=JSON.parse(atob((json.content||'').replace(/\n/g,''))); state.data=content; render(); }catch(err){ alert('Falha ao carregar: '+err.message+'\nSe o token estiver errado, apague-o em Conectar GitHub.'); } }
+  function encode64(s){ return btoa(unescape(encodeURIComponent(s))); }
+  async function saveToGitHub(){ try{ const {owner,repo,path,branch}=cfg; if(!cfg.token){ alert('Para salvar, clique em Conectar GitHub e cole um token com Contents: Read/Write.'); return; } state.data.lastModified=nowISO(); const body=JSON.stringify(state.data,null,2); const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`; try{ const r=await ghFetch(url,{method:'PUT',body:JSON.stringify({message:`update via app ${new Date().toLocaleString('pt-BR')}`,content:encode64(body),sha:state.sha||undefined,branch})},'require'); state.sha=(r.content&&r.content.sha)||state.sha; alert('Salvo no GitHub.'); }catch(e){ if(String(e.message).includes('409')||String(e.message).includes('sha')){ const latest=await ghFetch(`${url}?ref=${encodeURIComponent(branch)}`,{},'require'); state.sha=latest.sha; const r2=await ghFetch(url,{method:'PUT',body:JSON.stringify({message:`update via app (sha fix) ${new Date().toLocaleString('pt-BR')}`,content:encode64(body),sha:state.sha,branch})},'require'); state.sha=(r2.content&&r2.content.sha)||state.sha; alert('Salvo após atualizar SHA.'); } else { throw e; } } }catch(err){ alert('Falha ao salvar: '+err.message+'\nVerifique o escopo do token: Contents (Read & Write).'); } }
+
+  // ===== Eventos =====
+  document.getElementById('themeBtn').onclick=()=>{ const html=document.documentElement; const next=html.getAttribute('data-theme')==='dark'?'light':'dark'; html.setAttribute('data-theme',next); localStorage.setItem('xerox_theme',next); };
+  document.getElementById('connectBtn').onclick=()=>{ document.getElementById('tokenOverlay').style.display='block'; document.getElementById('tokenModal').style.display='grid'; document.getElementById('tokenInput').value=cfg.token||''; };
+  document.getElementById('cancelToken').onclick=()=>{ document.getElementById('tokenOverlay').style.display='none'; document.getElementById('tokenModal').style.display='none'; };
+  document.getElementById('saveToken').onclick=()=>{ cfg.token=document.getElementById('tokenInput').value.trim(); saveCfg(); document.getElementById('tokenOverlay').style.display='none'; document.getElementById('tokenModal').style.display='none'; };
+
+  document.getElementById('loadBtn').onclick=loadFromGitHub;
+  document.getElementById('saveBtn').onclick=saveToGitHub;
+
+  document.getElementById('search').addEventListener('input',()=>{ applyFilterAndSort(); renderTable(); });
+  document.getElementById('sort').addEventListener('change',()=>{ applyFilterAndSort(); renderTable(); });
+  document.getElementById('tbody').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const id=b.dataset.id; const act=b.dataset.act; if(act==='delta') applyDelta(id, Number(b.dataset.delta)); if(act==='reset') resetOne(id); if(act==='remove') removeOne(id); });
+  document.getElementById('tbody').addEventListener('change',e=>{ const i=e.target.closest('input[data-act="discount"]'); if(!i) return; setDiscount(i.dataset.id, i.value); });
+  document.getElementById('addBtn').onclick=addProfessor;
+  document.getElementById('exportBtn').onclick=()=>{ const body=JSON.stringify(state.data,null,2); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([body],{type:'application/json'})); a.download=`xerox_${(state.data.month||'mes').replace(/\s+/g,'_')}.json`; a.click(); };
+  document.getElementById('csvBtn').onclick=()=>{ const rows=[["id","name","discipline","quota","used","discount","remaining"]].concat(state.data.professors.map(p=>[p.id,p.name,p.discipline,p.quota,p.used,p.discount,remaining(p)])); const csv=rows.map(r=>r.map(c=>`"${String(c).replaceAll('"','""')}"`).join(',')).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`xerox_${state.data.month||'mes'}.csv`; a.click(); };
+  document.getElementById('filePicker').addEventListener('change',async e=>{ const file=e.target.files[0]; if(!file) return; const text=await file.text(); try{ const obj=JSON.parse(text); state.data=obj; state.sha=null; render(); }catch(err){ alert('JSON inválido.'); } e.target.value=''; });
+  document.getElementById('printBtn').onclick=()=>window.print();
+
+  // ===== Inicialização =====
+  loadCfg();
+  // Mostra dados de exemplo até carregar do GitHub
+  state.data=demo; render();
+})();
+</script>
 </body>
 </html>
