@@ -390,10 +390,11 @@ class JogoABC {
     
     configurarDragAndDrop() {
         document.addEventListener('dragstart', (e) => {
-            if (e.target.classList.contains('draggable-letter')) {
+            if (e.target.classList.contains('draggable-letter') && !e.target.classList.contains('used')) {
                 e.target.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', e.target.dataset.letra);
                 e.dataTransfer.setData('text/index', e.target.dataset.index);
+                e.dataTransfer.effectAllowed = 'move';
             }
         });
         
@@ -412,7 +413,14 @@ class JogoABC {
         
         document.addEventListener('dragleave', (e) => {
             if (e.target.classList.contains('word-slot')) {
-                e.target.classList.remove('drag-over');
+                // Só remove se não estamos dentro de um elemento filho
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX;
+                const y = e.clientY;
+                
+                if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                    e.target.classList.remove('drag-over');
+                }
             }
         });
         
@@ -425,16 +433,19 @@ class JogoABC {
                 const letraIndex = e.dataTransfer.getData('text/index');
                 const slotIndex = parseInt(e.target.dataset.index);
                 
-                this.colocarLetraNoSlot(letra, slotIndex, letraIndex);
+                // Validar se temos todos os dados necessários
+                if (letra && letraIndex !== '' && !isNaN(slotIndex)) {
+                    this.colocarLetraNoSlot(letra, slotIndex, letraIndex);
+                }
             }
         });
     }
     
     colocarLetraNoSlot(letra, slotIndex, letraOriginalIndex) {
-        const slot = document.querySelector(`[data-index="${slotIndex}"]`);
-        const letraElement = document.querySelector(`[data-index="${letraOriginalIndex}"]`);
+        const slot = document.querySelector(`.word-slot[data-index="${slotIndex}"]`);
+        const letraElement = document.querySelector(`.draggable-letter[data-index="${letraOriginalIndex}"]`);
         
-        if (slot && letraElement) {
+        if (slot && letraElement && !letraElement.classList.contains('used')) {
             // Limpar slot se já tiver letra
             if (this.palavraAtualConstruida[slotIndex]) {
                 const letraAnterior = slot.textContent;
