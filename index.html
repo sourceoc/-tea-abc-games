@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Especial - Jogos Educativos Modernos</title>
+    <meta name="description" content="Jogos educativos modernos para alfabetização infantil">
+    <meta name="theme-color" content="#6366f1">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Ícones -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tela de Carregamento -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">🎮</div>
+            <h1 class="loading-title">ABC Especial</h1>
+            <div class="loading-spinner">
+                <div class="spinner-circle"></div>
+            </div>
+            <p class="loading-text">Preparando a diversão...</p>
+        </div>
+    </div>
+
+    <!-- Menu Principal -->
+    <div id="menu-principal" class="screen active">
+        <div class="background-animation">
+            <div class="floating-shapes">
+                <div class="shape shape-1">🌟</div>
+                <div class="shape shape-2">🎯</div>
+                <div class="shape shape-3">🏆</div>
+                <div class="shape shape-4">📚</div>
+                <div class="shape shape-5">🎨</div>
+                <div class="shape shape-6">🚀</div>
+            </div>
+        </div>
+        
+        <div class="menu-container">
+            <header class="main-header">
+                <h1 class="main-title">
+                    <span class="title-icon">🎮</span>
+                    ABC Especial
+                    <span class="title-subtitle">Aprender é Diversão</span>
+                </h1>
+            </header>
+            
+            <div class="menu-cards">
+                <div class="game-card" onclick="iniciarJogo('letras')">
+                    <div class="card-icon">🔤</div>
+                    <h3 class="card-title">Descobrir Letras</h3>
+                    <p class="card-description">Identifique letras do alfabeto de forma divertida</p>
+                    <div class="card-badge">Iniciante</div>
+                </div>
+                
+                <div class="game-card" onclick="iniciarJogo('palavras')">
+                    <div class="card-icon">🧩</div>
+                    <h3 class="card-title">Construir Palavras</h3>
+                    <p class="card-description">Monte palavras arrastando letras</p>
+                    <div class="card-badge">Intermediário</div>
+                </div>
+                
+                <div class="game-card" onclick="iniciarJogo('imagens')">
+                    <div class="card-icon">🖼️</div>
+                    <h3 class="card-title">Associar Imagens</h3>
+                    <p class="card-description">Conecte palavras com suas imagens</p>
+                    <div class="card-badge">Avançado</div>
+                </div>
+            </div>
+            
+            <div class="menu-footer">
+                <button class="btn-secondary" onclick="mostrarConfiguracoes()">
+                    <span class="btn-icon">⚙️</span>
+                    Configurações
+                </button>
+                <button class="btn-secondary" onclick="mostrarEstatisticas()">
+                    <span class="btn-icon">📊</span>
+                    Estatísticas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo das Letras -->
+    <div id="jogo-letras" class="screen game-screen">
+        <div class="game-header">
+            <button class="btn-back" onclick="voltarMenu()">
+                <span class="btn-icon">←</span>
+                Voltar
+            </button>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-value" id="pontos-letras">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="sequencia-letras">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span class="stat-value" id="vidas-letras">3</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="letters-game-container">
+            <div class="question-section">
+                <h2 class="question-title">Qual é esta letra?</h2>
+                <div class="letter-display-modern" id="letra-atual">A</div>
+                <button class="sound-btn" id="btn-som-letra" onclick="reproduzirSomLetra()">
+                    <span class="sound-icon">🔊</span>
+                    Ouvir Novamente
+                </button>
+            </div>
+            
+            <div class="answers-section">
+                <div class="letters-grid" id="opcoes-letras">
+                    <!-- Opções serão inseridas dinamicamente -->
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progresso-letras" style="width: 0%"></div>
+                </div>
+                <span class="progress-text" id="texto-progresso-letras">0 de 10</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo de Palavras -->
+    <div id="jogo-palavras" class="screen game-screen">
+        <div class="game-header">
+            <button class="btn-back" onclick="voltarMenu()">
+                <span class="btn-icon">←</span>
+                Voltar
+            </button>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-value" id="pontos-palavras">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="sequencia-palavras">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span class="stat-value" id="vidas-palavras">3</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="words-game-container">
+            <div class="target-section">
+                <h2 class="question-title">Monte a palavra:</h2>
+                <div class="word-target-display" id="palavra-objetivo">GATO</div>
+                <button class="sound-btn" onclick="reproduzirSomPalavra()">
+                    <span class="sound-icon">🔊</span>
+                    Ouvir Palavra
+                </button>
+            </div>
+            
+            <div class="construction-area">
+                <div class="word-slots" id="slots-palavra">
+                    <!-- Slots para as letras da palavra -->
+                </div>
+            </div>
+            
+            <div class="letters-pool-section">
+                <h3 class="section-title">Arraste as letras:</h3>
+                <div class="letters-pool" id="pool-letras">
+                    <!-- Letras disponíveis para arrastar -->
+                </div>
+            </div>
+            
+            <div class="action-section">
+                <button class="btn-primary" id="btn-verificar-palavra" onclick="verificarPalavra()" disabled>
+                    <span class="btn-icon">✓</span>
+                    Verificar
+                </button>
+                <button class="btn-secondary" onclick="limparPalavra()">
+                    <span class="btn-icon">🔄</span>
+                    Recomeçar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo de Imagens -->
+    <div id="jogo-imagens" class="screen game-screen">
+        <div class="game-header">
+            <button class="btn-back" onclick="voltarMenu()">
+                <span class="btn-icon">←</span>
+                Voltar
+            </button>
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-value" id="pontos-imagens">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="sequencia-imagens">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span class="stat-value" id="vidas-imagens">3</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="images-game-container">
+            <div class="word-challenge-section">
+                <h2 class="question-title">Encontre a imagem para:</h2>
+                <div class="challenge-word-display" id="palavra-desafio">CACHORRO</div>
+                <button class="sound-btn" onclick="reproduzirSomPalavraImagem()">
+                    <span class="sound-icon">🔊</span>
+                    Ouvir Palavra
+                </button>
+            </div>
+            
+            <div class="images-selection-area">
+                <div class="images-grid" id="grade-imagens">
+                    <!-- Opções de imagens serão inseridas dinamicamente -->
+                </div>
+            </div>
+            
+            <div class="confirmation-section" id="secao-confirmacao" style="display: none;">
+                <p class="confirmation-text">Você escolheu esta imagem?</p>
+                <div class="confirmation-buttons">
+                    <button class="btn-success" onclick="confirmarEscolha()">
+                        <span class="btn-icon">✓</span>
+                        Confirmar
+                    </button>
+                    <button class="btn-warning" onclick="cancelarEscolha()">
+                        <span class="btn-icon">✗</span>
+                        Escolher Outra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div id="modal-resultado" class="modal">
+        <div class="modal-content result-modal">
+            <div class="result-icon" id="icone-resultado">🎉</div>
+            <h2 class="result-title" id="titulo-resultado">Parabéns!</h2>
+            <p class="result-message" id="mensagem-resultado">Resposta correta!</p>
+            <div class="result-stats" id="stats-resultado">
+                <div class="result-stat">
+                    <span class="stat-label">Pontos:</span>
+                    <span class="stat-number" id="pontos-ganhos">+10</span>
+                </div>
+            </div>
+            <button class="btn-primary" id="btn-continuar" onclick="continuarJogo()">
+                Continuar
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Game Over -->
+    <div id="modal-game-over" class="modal">
+        <div class="modal-content game-over-modal">
+            <div class="game-over-icon">😔</div>
+            <h2 class="game-over-title">Fim de Jogo</h2>
+            <p class="game-over-message">Suas vidas acabaram, mas você jogou muito bem!</p>
+            <div class="final-stats" id="stats-finais">
+                <div class="final-stat">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-label">Pontos Totais:</span>
+                    <span class="stat-number" id="pontos-totais-final">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-label">Melhor Sequência:</span>
+                    <span class="stat-number" id="melhor-sequencia-final">0</span>
+                </div>
+            </div>
+            <div class="game-over-actions">
+                <button class="btn-primary" onclick="jogarNovamente()">
+                    <span class="btn-icon">🔄</span>
+                    Jogar Novamente
+                </button>
+                <button class="btn-secondary" onclick="voltarMenu()">
+                    <span class="btn-icon">🏠</span>
+                    Menu Principal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Vitória -->
+    <div id="modal-vitoria" class="modal">
+        <div class="modal-content victory-modal">
+            <div class="victory-icon">🏆</div>
+            <h2 class="victory-title">Parabéns!</h2>
+            <p class="victory-message">Você completou todas as fases com sucesso!</p>
+            <div class="victory-fireworks">
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+            </div>
+            <div class="victory-stats" id="stats-vitoria">
+                <div class="victory-stat">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-label">Pontuação Final:</span>
+                    <span class="stat-number" id="pontuacao-final">0</span>
+                </div>
+                <div class="victory-stat">
+                    <span class="stat-icon">💯</span>
+                    <span class="stat-label">Precisão:</span>
+                    <span class="stat-number" id="precisao-final">0%</span>
+                </div>
+            </div>
+            <button class="btn-success" onclick="voltarMenu()">
+                <span class="btn-icon">🎉</span>
+                Voltar ao Menu
+            </button>
+        </div>
+    </div>
+
+    <!-- Área de Feedback Visual -->
+    <div id="feedback-area" class="feedback-area"></div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
